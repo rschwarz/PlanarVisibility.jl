@@ -6,6 +6,10 @@
 - [pyvisgraph](https://github.com/TaipanRex/pyvisgraph): Python, MIT
 - [visibility_graph](https://github.com/davetcoleman/visibility_graph): C, (no copyright specified?)
 
+## Related tools
+
+- [geojson.io](https://geojson.io/): Viewing and editing of GeoJSON in the browser.
+
 ## Geometric types to consider for the interface
 
 - [GeoInterface](https://github.com/JuliaGeo/GeoInterface.jl)
