@@ -1,16 +1,9 @@
 # PlanarVisibility
+
 Compute visibility graph for polygonal obstacles in the plane.
 
-## Related projects (other languages)
+Also support line-shaped obstacles. Consider all points that are part of
+obstacles, but allow subsequent addition of more points.
 
-- [VisiLibity1](https://github.com/karlobermeyer/VisiLibity1): C++, LGPL
-- [pyvisgraph](https://github.com/TaipanRex/pyvisgraph): Python, MIT
-- [visibility_graph](https://github.com/davetcoleman/visibility_graph): C, (no copyright specified?)
-
-## Geometric types to consider for the interface
-
-- [GeoInterface](https://github.com/JuliaGeo/GeoInterface.jl)
-- [GeoJSON](https://github.com/JuliaGeo/GeoJSON.jl)
-- [GeometryBasics](https://github.com/SimonDanisch/GeometryBasics.jl)
-- [GeometryTypes](https://github.com/JuliaGeometry/GeometryTypes.jl)
-- [RoamesGeometry](https://github.com/FugroRoames/RoamesGeometry.jl)
+This has applications in motion planning, but also surveillance (see: [Art
+gallery problem](https://en.wikipedia.org/wiki/Art_gallery_problem)).
