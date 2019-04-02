@@ -1,6 +1,6 @@
 module PlanarVisibility
 
-using GeoInterface: Point, Polygon
+using GeoInterface: Point, Polygon, coordinates, xcoord, ycoord
 using LightGraphs: SimpleGraph
 
 #
@@ -34,7 +34,17 @@ function extract_points(env::Environment)
     points = Point[]
     indices = Dict{Point, Int64}()
 
-    # for polygon in env.polygons
+    for polygon in env.polygons
+        for linestring in coordinates(polygon)
+            for position in coordinates(linestring)
+                point = Point(position)
+                if !haskey(indices, point)
+                    push!(points, point)
+                    indices[point] = length(points)
+                end
+            end
+        end
+    end
 
     return points, indices
 end
