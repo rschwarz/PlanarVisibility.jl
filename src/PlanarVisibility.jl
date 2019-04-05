@@ -1,6 +1,8 @@
 module PlanarVisibility
 
 import Base: length, push!
+using LinearAlgebra
+
 using GeoInterface
 using LightGraphs: SimpleGraph
 
@@ -88,6 +90,11 @@ function angle_to_east(origin::Point, point::Point)::Float64
     end
 end
 
+"Find permutation to iterate thru points in counterclockwise order."
+function sortperm_ccw(points::Vector{Point}, origin::Point)::Vector{Int}
+    by = p -> angle_to_east(origin, p)
+    return sortperm(points, by=by)
+end
 
 #
 # Constructing visibility graphs

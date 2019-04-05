@@ -1,6 +1,7 @@
 using Test
 using GeoInterface
-using PlanarVisibility: Environment, PointSet, extract_points, angle_to_east
+using PlanarVisibility: Environment, PointSet, extract_points, angle_to_east,
+    sortperm_ccw
 
 @testset "point sets" begin
     # empty set
@@ -93,4 +94,14 @@ end
     @test angle_to_east(p2, p3) ≈ 2π/4
     @test angle_to_east(p3, p1) ≈ 7/8 * 2π
     @test angle_to_east(p3, p2) ≈ 3/4 * 2π
+end
+
+@testset "sorting points in counter clockwise order" begin
+    #  4  3
+    #  1  2
+    p1, p2, p3, p4 = Point.([[0, 0], [1, 0], [1, 1], [0, 1]])
+
+    @test sortperm_ccw([p2, p3, p4], p1) == [1, 2, 3]
+    @test sortperm_ccw([p4, p2, p3], p1) == [2, 3, 1]
+    @test sortperm_ccw([p3, p2, p1], p4) == [1, 3, 2]
 end
