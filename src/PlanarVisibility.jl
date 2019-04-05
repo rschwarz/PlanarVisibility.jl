@@ -1,6 +1,7 @@
 module PlanarVisibility
 
-using GeoInterface: Point, Polygon, coordinates, xcoord, ycoord
+import Base: length, push!
+using GeoInterface
 using LightGraphs: SimpleGraph
 
 #
@@ -14,11 +15,42 @@ struct Environment
     polygons::Array{Polygon}
 end
 
+"Set of points with indices."
+struct PointSet
+    points::Array{Point}          # coordinates, insertion order
+    indices::Dict{Point, Int64}   # find index from point
+end
+PointSet() = PointSet([], Dict())
+
+length(set::PointSet) = length(set.points)
+
+"Add single point to set."
+function push!(set::PointSet, point::Point)
+    if !haskey(set.indices, point)
+        push!(set.points, point)
+        set.indices[point] = length(set.points)
+    end
+    return set
+end
+
+"Add single point (from position) to set."
+push!(set::PointSet, pos::Position) = push!(set, Point(pos))
+
+"Add all points of a geometry to set recursively."
+function push!(set::PointSet, coords::Vector{T}) where T
+    for c in coords
+        push!(set, c)
+    end
+    return set
+end
+
+"Add all points of a geometry to set recursively."
+push!(set::PointSet, geo::AbstractGeometry) = push!(set, coordinates(geo))
+
 "Visibility graph."
 struct VisibilityGraph
     env::Environment               # initial environment
-    points::Array{Point}           # all points (including environment)
-    indices::Dict{Point, Int64}    # map from point to array index
+    pointset::PointSet             # all points (including environment)
     graph::SimpleGraph{Int64}      # edges of visibility relation
 end
 
@@ -31,22 +63,11 @@ VisibilityGraph(env::Environment) = construct_graph(env)
 
 "Extract unique points from given environment."
 function extract_points(env::Environment)
-    points = Point[]
-    indices = Dict{Point, Int64}()
-
+    points = PointSet()
     for polygon in env.polygons
-        for linestring in coordinates(polygon)
-            for position in coordinates(linestring)
-                point = Point(position)
-                if !haskey(indices, point)
-                    push!(points, point)
-                    indices[point] = length(points)
-                end
-            end
-        end
+        push!(points, polygon)
     end
-
-    return points, indices
+    return points
 end
 
 
@@ -56,14 +77,14 @@ end
 
 function construct_graph(env::Environment)
     # extract points from environment
-    points, indices = extract_points(env)
+    points = extract_points(env)
 
     # build graph from disconnected points
     n = length(points)
     graph = SimpleGraph(n)
 
     # assemble result
-    return VisibilityGraph(env, points, indices, graph)
+    return VisibilityGraph(env, points, graph)
 end
 
 
