@@ -1,6 +1,41 @@
 using Test
 using GeoInterface
-using PlanarVisibility: Environment, extract_points
+using PlanarVisibility: Environment, PointSet, extract_points
+
+@testset "point sets" begin
+    # empty set
+    set = push!(PointSet(), [])
+    @test length(set) == 0
+
+    # add individual points
+    set = push!(PointSet(), Point([0.0, 0.0]))
+    @test length(set) == 1
+    push!(set, Point([0.0, 0.0]))
+    @test length(set) == 1
+    push!(set, Point([0.0, 1.0]))
+    @test length(set) == 2
+
+    # add positions
+    set = push!(PointSet(), [0.0, 0.0])
+    @test length(set) == 1
+
+    set = push!(PointSet(), [0.0, 0.0, 0.0])
+    @test length(set) == 1
+
+    # add line string coordinates
+    set = push!(PointSet(), [[0.0, 0.0], [0.0, 1.0], [1.0, 0.0]])
+    @test length(set) == 3
+
+    # add polygon coordinates
+    set = push!(PointSet(), [[[0.0, 0.0], [0.0, 1.0], [1.0, 0.0]]])
+    @test length(set) == 3
+
+    # add polygon with hole
+    set = push!(PointSet(),
+                Polygon([[[0.0, 0.0], [1.0, 0.0], [0.0, 1.0], [0.0, 0.0]],
+                         [[0.1, 0.1], [0.1, 0.9], [0.9, 0.1], [0.1, 0.1]]]))
+    @test length(set) == 6
+end
 
 @testset "extract_points" begin
     @testset "empty environment has no points" begin
