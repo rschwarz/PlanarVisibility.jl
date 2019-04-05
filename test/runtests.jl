@@ -1,6 +1,6 @@
 using Test
 using GeoInterface
-using PlanarVisibility: Environment, PointSet, extract_points
+using PlanarVisibility: Environment, PointSet, extract_points, angle_to_east
 
 @testset "point sets" begin
     # empty set
@@ -82,4 +82,15 @@ end
         @test set.points[6] == Point([2.0, 1.0])
         @test all(set.indices[set.points[i]] == i for i in 1:6)
     end
+end
+
+@testset "compute angles" begin
+    p1, p2, p3 = Point.([[0, 0], [1, 0], [1, 1]])
+    @test angle_to_east(p1, p1) == 0.0
+    @test angle_to_east(p1, p2) ≈ 0.0
+    @test angle_to_east(p1, p3) ≈ 2π/8
+    @test angle_to_east(p2, p1) ≈ 2π/2
+    @test angle_to_east(p2, p3) ≈ 2π/4
+    @test angle_to_east(p3, p1) ≈ 7/8 * 2π
+    @test angle_to_east(p3, p2) ≈ 3/4 * 2π
 end

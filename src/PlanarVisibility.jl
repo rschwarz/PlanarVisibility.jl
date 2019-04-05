@@ -70,6 +70,24 @@ function extract_points(env::Environment)
     return points
 end
 
+"Angle from origin to point rel. to horiz. line going east."
+function angle_to_east(origin::Point, point::Point)::Float64
+    diff = coordinates(point) - coordinates(origin)
+    distance = norm(diff)
+    altitude = diff[2]
+    if altitude > 0.0
+        return asin(altitude / distance)
+    elseif altitude == 0.0
+        if diff[1] >= 0.0
+            return 0.0
+        else
+            return π
+        end
+    else # altitude < 0.0
+        return 2π + asin(altitude / distance)
+    end
+end
+
 
 #
 # Constructing visibility graphs
