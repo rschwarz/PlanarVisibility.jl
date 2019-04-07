@@ -31,3 +31,12 @@ end
 
 "Add all points of a geometry to set recursively."
 push!(set::PointSet, geo::AbstractGeometry) = push!(set, coordinates(geo))
+
+"Get index of given point."
+getindex(set::PointSet, point::Point) = set.indices[point]
+
+"Get index for a position."
+getindex(set::PointSet, pos::Position) = set.indices[Point(pos)]
+
+"Get point at index."
+getindex(set::PointSet, idx::Int64) = set.points[idx]

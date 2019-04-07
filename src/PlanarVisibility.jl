@@ -1,6 +1,6 @@
 module PlanarVisibility
 
-import Base: length, push!
+import Base: length, push!, getindex
 using LinearAlgebra
 
 using GeoInterface

@@ -36,6 +36,14 @@ using PlanarVisibility: Environment, PointSet, extract_points, angle_to_east,
                 Polygon([[[0.0, 0.0], [1.0, 0.0], [0.0, 1.0], [0.0, 0.0]],
                          [[0.1, 0.1], [0.1, 0.9], [0.9, 0.1], [0.1, 0.1]]]))
     @test length(set) == 6
+
+    # test getindex
+    @test set[1] == Point([0.0, 0.0])
+    @test set[Point([0.0, 0.0])] == 1
+    @test set[[0.0, 0.0]] == 1
+    @test set[4] == Point([0.1, 0.1])
+    @test set[Point([0.1, 0.1])] == 4
+    @test set[[0.1, 0.1]] == 4
 end
 
 @testset "extract_points" begin
