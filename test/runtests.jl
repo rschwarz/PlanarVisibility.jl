@@ -1,7 +1,8 @@
 using Test
 using GeoInterface
-using PlanarVisibility: Environment, PointSet, extract_points, angle_to_east,
-    sortperm_ccw
+using PlanarVisibility: Environment, PointSet, extract_points, extract_edges,
+    angle_to_east, sortperm_ccw
+using LightGraphs: nv, ne, edges, neighbors
 
 @testset "point sets" begin
     # empty set
@@ -91,6 +92,30 @@ end
         @test set.points[6] == Point([2.0, 1.0])
         @test all(set.indices[set.points[i]] == i for i in 1:6)
     end
+end
+
+@testset "extract_edges" begin
+    # empty environment
+    env = Environment([])
+    set = extract_points(env)
+    graph = extract_edges(env, set)
+    @test nv(graph) == 0
+    @test ne(graph) == 0
+
+    # polygon with hole
+    env = Environment([
+        Polygon([[[0.0, 0.0], [1.0, 0.0], [0.0, 1.0], [0.0, 0.0]],
+                 [[0.1, 0.1], [0.1, 0.9], [0.9, 0.1], [0.1, 0.1]]])])
+    set = extract_points(env)
+    graph = extract_edges(env, set)
+    @test nv(graph) == 6
+    @test ne(graph) == 6
+    @test neighbors(graph, 1) == [2, 3]
+    @test neighbors(graph, 2) == [1, 3]
+    @test neighbors(graph, 3) == [1, 2]
+    @test neighbors(graph, 4) == [5, 6]
+    @test neighbors(graph, 5) == [4, 6]
+    @test neighbors(graph, 6) == [4, 5]
 end
 
 @testset "compute angles" begin

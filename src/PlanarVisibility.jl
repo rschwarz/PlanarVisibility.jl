@@ -4,7 +4,7 @@ import Base: length, push!, getindex
 using LinearAlgebra
 
 using GeoInterface
-using LightGraphs: SimpleGraph
+using LightGraphs: SimpleGraph, add_edge!
 
 include("points.jl")
 
@@ -43,6 +43,27 @@ function extract_points(env::Environment)
     return points
 end
 
+"Extract edges from given environment."
+function extract_edges(env::Environment, points::PointSet)
+    # start with disconnected graph
+    n = length(points)
+    graph = SimpleGraph(n)
+
+    # iterate over all polygons
+    for polygon in env.polygons
+        # iterate over outer and inner line strings (coordinates)
+        for str in coordinates(polygon)
+            # iterate over pairs of positions, with wrap-around
+            for (pos1, pos2) in zip(str, [str[2:end]; str[1:1]])
+                pos1 == pos2 && continue # skip with explicit close
+                add_edge!(graph, points[pos1], points[pos2])
+            end
+        end
+    end
+
+    return graph
+end
+
 "Angle from origin to point rel. to horiz. line going east."
 function angle_to_east(origin::Point, point::Point)::Float64
     diff = coordinates(point) - coordinates(origin)
@@ -75,6 +96,9 @@ end
 function construct_graph(env::Environment)
     # extract points from environment
     points = extract_points(env)
+
+    # extract edges from environment
+    envgraph = extract_edges(env, points)
 
     # build graph from disconnected points
     n = length(points)
