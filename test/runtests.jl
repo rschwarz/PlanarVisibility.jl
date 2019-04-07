@@ -1,7 +1,7 @@
 using Test
 using GeoInterface
 using PlanarVisibility: Environment, PointSet, extract_points, extract_edges,
-    angle_to_east, sortperm_ccw
+    angle_to_east, sortperm_ccw, intersect_segments
 using LightGraphs: nv, ne, edges, neighbors
 
 @testset "point sets" begin
@@ -137,4 +137,23 @@ end
     @test sortperm_ccw([p2, p3, p4], p1) == [1, 2, 3]
     @test sortperm_ccw([p4, p2, p3], p1) == [2, 3, 1]
     @test sortperm_ccw([p3, p2, p1], p4) == [1, 3, 2]
+end
+
+@testset "intersecting segments" begin
+    # \/
+    # /\
+    @test intersect_segments([0., 0.], [1., 1.], [1., 0.], [0., 1.]) == true
+    # | |
+    # | |
+    @test intersect_segments([0., 0.], [0., 1.], [1., 0.], [1., 1.]) == false
+    # |
+    # |__
+    @test intersect_segments([0., 0.], [0., 1.], [0., 0.], [1., 0.]) == true
+    # |
+    # | __
+    @test intersect_segments([0., 0.], [0., 1.], [1., 0.], [2., 0.]) == false
+    # -- --
+    @test intersect_segments([0., 0.], [0., 2.], [0., 3.], [0., 5.]) == false
+    # -=-  (parallel but intersecting)
+    @test_broken intersect_segments([0., 0.], [0., 2.], [0., 1.], [0., 5.]) == true
 end

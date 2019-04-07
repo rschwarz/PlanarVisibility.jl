@@ -88,10 +88,37 @@ function sortperm_ccw(points::Vector{Point}, origin::Point)::Vector{Int}
     return sortperm(points, by=by)
 end
 
+"Check whether segments [a b] and [c d] intersect."
+function intersect_segments(a::Position, b::Position, c::Position, d::Position)
+    # Solve system of parametric line equations.
+    A = [(a - b) (d - c)]
+    if rank(A) == 1 # parallel segments
+        # TODO: handle correctly
+        return false
+    else
+        x = A \ (a - c)
+        return all(0.0 .<= x .<= 1.0)
+    end
+end
+
+"Check whether segments [a b] and [c d] intersect."
+function intersect_segments(a::Point, b::Point, c::Point, d::Point)
+    return intersect_segments(coordinates(a), coordinates(b),
+                              coordinates(c), coordinates(d))
+end
+
 
 #
 # Constructing visibility graphs
 #
+
+"Find all visible points from given origin."
+function visible_points(points::PointSet, envgraph::SimpleGraph, origin::Int64)
+    # find out in which order to consider candidates
+    perm = sortperm_ccw(points.points, points[origin])
+
+    # starting with east-looking horizontal ray, which edges do we intersect?
+end
 
 function construct_graph(env::Environment)
     # extract points from environment
@@ -103,6 +130,13 @@ function construct_graph(env::Environment)
     # build graph from disconnected points
     n = length(points)
     graph = SimpleGraph(n)
+
+    # iterate over all points and find out what can be seen from there
+    for i in 1:n
+        for j in visible_points(point, envgraph, i)
+            add_edge!(graph, i, j)
+        end
+    end
 
     # assemble result
     return VisibilityGraph(env, points, graph)
