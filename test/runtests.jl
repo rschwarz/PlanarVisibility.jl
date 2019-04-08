@@ -4,6 +4,9 @@ using PlanarVisibility: Environment, PointSet, extract_points, extract_edges,
     angle_to_east, sortperm_ccw, intersect_segments
 using LightGraphs: nv, ne, edges, neighbors
 
+using PlanarVisibility
+const PV = PlanarVisibility
+
 @testset "point sets" begin
     # empty set
     set = push!(PointSet(), [])
@@ -137,6 +140,27 @@ end
     @test sortperm_ccw([p2, p3, p4], p1) == [1, 2, 3]
     @test sortperm_ccw([p4, p2, p3], p1) == [2, 3, 1]
     @test sortperm_ccw([p3, p2, p1], p4) == [1, 3, 2]
+end
+
+@testset "triangle orientation" begin
+    # p -- q -- r
+    p, q, r = Point.([[0.0, 0.0], [1.0, 2.0], [2.0, 4.0]])
+    @test PV.orientation(p, q, r) == PV.COLLINEAR
+    @test PV.orientation(r, q, p) == PV.COLLINEAR
+    @test PV.orientation(q, r, p) == PV.COLLINEAR
+    @test PV.orientation(r, p, q) == PV.COLLINEAR
+    @test PV.orientation(q, p, r) == PV.COLLINEAR
+    @test PV.orientation(p, r, q) == PV.COLLINEAR
+
+    #   ,q.
+    # p'---`r
+    p, q, r = Point.([[0.0, 0.0], [1.0, 1.0], [2.0, 0.0]])
+    @test PV.orientation(p, q, r) == PV.CLOCKWISE
+    @test PV.orientation(r, q, p) == PV.COUNTERCLOCKWISE
+    @test PV.orientation(q, r, p) == PV.CLOCKWISE
+    @test PV.orientation(r, p, q) == PV.CLOCKWISE
+    @test PV.orientation(q, p, r) == PV.COUNTERCLOCKWISE
+    @test PV.orientation(p, r, q) == PV.COUNTERCLOCKWISE
 end
 
 @testset "intersecting segments" begin

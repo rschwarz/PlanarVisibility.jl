@@ -7,6 +7,7 @@ using GeoInterface
 using LightGraphs: SimpleGraph, add_edge!
 
 include("points.jl")
+include("intersect.jl")
 
 
 #
