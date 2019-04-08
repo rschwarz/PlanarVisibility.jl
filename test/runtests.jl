@@ -174,18 +174,24 @@ end
 @testset "intersecting segments" begin
     # \/
     # /\
-    @test PV.intersect_segments([0., 0.], [1., 1.], [1., 0.], [0., 1.]) == true
+    points = Point.([[0., 0.], [1., 1.], [1., 0.], [0., 1.]])
+    @test PV.intersect_segments(points...) == true
     # | |
     # | |
-    @test PV.intersect_segments([0., 0.], [0., 1.], [1., 0.], [1., 1.]) == false
+    points = Point.([[0., 0.], [0., 1.], [1., 0.], [1., 1.]])
+    @test PV.intersect_segments(points...) == false
     # |
     # |__
-    @test PV.intersect_segments([0., 0.], [0., 1.], [0., 0.], [1., 0.]) == true
+    points = Point.([[0., 0.], [0., 1.], [0., 0.], [1., 0.]])
+    @test PV.intersect_segments(points...) == true
     # |
     # | __
-    @test PV.intersect_segments([0., 0.], [0., 1.], [1., 0.], [2., 0.]) == false
+    points = Point.([[0., 0.], [0., 1.], [1., 0.], [2., 0.]])
+    @test PV.intersect_segments(points...) == false
     # -- --
-    @test PV.intersect_segments([0., 0.], [0., 2.], [0., 3.], [0., 5.]) == false
+    points = Point.([[0., 0.], [0., 2.], [0., 3.], [0., 5.]])
+    @test PV.intersect_segments(points...) == false
     # -=-  (parallel but intersecting)
-    @test_broken PV.intersect_segments([0., 0.], [0., 2.], [0., 1.], [0., 5.]) == true
+    points = Point.([[0., 0.], [0., 2.], [0., 1.], [0., 5.]])
+    @test PV.intersect_segments(points...) == true
 end

@@ -89,25 +89,6 @@ function sortperm_ccw(points::Vector{Point}, origin::Point)::Vector{Int}
     return sortperm(points, by=by)
 end
 
-"Check whether segments [a b] and [c d] intersect."
-function intersect_segments(a::Position, b::Position, c::Position, d::Position)
-    # Solve system of parametric line equations.
-    A = [(a - b) (d - c)]
-    if rank(A) == 1 # parallel segments
-        # TODO: handle correctly
-        return false
-    else
-        x = A \ (a - c)
-        return all(0.0 .<= x .<= 1.0)
-    end
-end
-
-"Check whether segments [a b] and [c d] intersect."
-function intersect_segments(a::Point, b::Point, c::Point, d::Point)
-    return intersect_segments(coordinates(a), coordinates(b),
-                              coordinates(c), coordinates(d))
-end
-
 
 #
 # Constructing visibility graphs
