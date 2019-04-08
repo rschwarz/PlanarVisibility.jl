@@ -160,6 +160,17 @@ end
     @test PV.orientation(p, r, q) == PV.COUNTERCLOCKWISE
 end
 
+@testset "collinear intersection" begin
+    # p -- q -- r
+    p, q, r = Point.([[0.0, 0.0], [1.0, 2.0], [2.0, 4.0]])
+    @test PV.collinear_intersect(p, q, r) == true
+    @test PV.collinear_intersect(r, q, p) == true
+    @test PV.collinear_intersect(q, r, p) == false
+    @test PV.collinear_intersect(r, p, q) == false
+    @test PV.collinear_intersect(q, p, r) == false
+    @test PV.collinear_intersect(p, r, q) == false
+end
+
 @testset "intersecting segments" begin
     # \/
     # /\
