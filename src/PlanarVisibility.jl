@@ -4,7 +4,7 @@ import Base: length, push!, getindex
 using LinearAlgebra
 
 using GeoInterface
-using LightGraphs: SimpleGraph, add_edge!
+using LightGraphs: SimpleGraph, Edge, add_edge!, edges
 
 include("points.jl")
 include("intersect.jl")
@@ -96,10 +96,41 @@ end
 
 "Find all visible points from given origin."
 function visible_points(points::PointSet, envgraph::SimpleGraph, origin::Int64)
-    # find out in which order to consider candidates
-    perm = sortperm_ccw(points.points, points[origin])
+    # point at origin
+    orig = points[origin]
 
-    # starting with east-looking horizontal ray, which edges do we intersect?
+    # starting with east-looking horizontal ray
+    xmax = maximum([xcoord(coordinates(p)) for p in points.points])
+    ray = Point([xmax + 1.0, ycoord(coordinates(orig))])
+
+    # currently intersecting edges
+    open_edges = Set{Edge}()
+    for e in edges(envgraph)
+        if intersect_segments(orig, ray, points[e.src], points[e.dst])
+            # TODO: special case when ray intersects at src/dst?
+            push!(open_edges, e)
+        end
+    end
+
+    # counterclockwise sweep to consider all candidates
+    perm = sortperm_ccw(points.points, orig)
+    result = Int[]
+    for index in perm
+        cand = points[index]
+        visible = true
+        for e in open_edges
+            # TODO: special case when cand belongs to edge?
+            if intersect_segments(orig, cand, points[e.src], points[e.dst])
+                visible = false
+                break
+            end
+        end
+        if visible
+            push!(result, index)
+        end
+    end
+
+    return result
 end
 
 function construct_graph(env::Environment)
@@ -115,7 +146,7 @@ function construct_graph(env::Environment)
 
     # iterate over all points and find out what can be seen from there
     for i in 1:n
-        for j in visible_points(point, envgraph, i)
+        for j in visible_points(points, envgraph, i)
             add_edge!(graph, i, j)
         end
     end
