@@ -114,27 +114,50 @@ function visible_points(points::PointSet, envgraph::SimpleGraph, origin::Int64)
     # currently intersecting edges
     open_edges = Set{Edge}()
     for e in edges(envgraph)
-        if intersect_segments(orig, ray, points[e.src], points[e.dst])
-            # TODO: special case when ray intersects at src/dst?
-            push!(open_edges, e)
-        end
+        # skip non-intersecting edges
+        intersect_segments(orig, ray, points[e.src], points[e.dst]) || continue
+        # skip those edges where the endpoint is on the ray
+        !collinear_intersect(orig, points[e.src], ray) || continue
+        !collinear_intersect(orig, points[e.dst], ray) || continue
+        push!(open_edges, sorted(e))
     end
 
     # counterclockwise sweep to consider all candidates
     perm = sortperm_ccw(points.points, orig)
     result = Int[]
     for index in perm
+        index == origin && continue
         cand = points[index]
+        @show index open_edges cand
+
+        # open edges: rm incident, clockwise edges
+        for neighbor in neighbors(envgraph, index)
+            edge = sorted(Edge(index, neighbor))
+            edge in open_edges || continue
+            if orientation(orig, cand, points[neighbor]) == CLOCKWISE
+                delete!(open_edges, edge)
+            end
+        end
+
         visible = true
         for e in open_edges
-            # TODO: special case when cand belongs to edge?
             if intersect_segments(orig, cand, points[e.src], points[e.dst])
                 visible = false
                 break
             end
         end
+
+        # TODO: check if line-of-sight is inside of polygon
+
         if visible
             push!(result, index)
+        end
+
+        # open edges: add incident, counterclockwise edges
+        for neighbor in neighbors(envgraph, index)
+            if orientation(orig, cand, points[neighbor]) == COUNTERCLOCKWISE
+                push!(open_edges, sorted(Edge(index, neighbor)))
+            end
         end
     end
 
