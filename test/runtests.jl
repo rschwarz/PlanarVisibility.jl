@@ -210,3 +210,21 @@ end
     points = Point.([[0., 0.], [0., 2.], [0., 1.], [0., 5.]])
     @test PV.intersect_segments(points...) == true
 end
+
+@testset "visible points -- lines" begin
+    #  1-2
+    # 3---4
+    #  5-6
+    points = PV.PointSet()
+    push!(points, [[1.0, 2.0], [2.0, 2.0],
+                   [0.0, 1.0], [3.0, 1.0],
+                   [1.0, 0.0], [2.0, 0.0]])
+    @test length(points) == 6
+
+    graph = SimpleGraph(6)
+    add_edge!(graph, 1, 2)
+    add_edge!(graph, 3, 4)
+    add_edge!(graph, 5, 6)
+
+    @test_broken PV.visible_points(points, graph, 1) == [2, 3, 4]
+end
