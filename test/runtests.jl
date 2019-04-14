@@ -1,6 +1,6 @@
 using Test
 using GeoInterface
-using LightGraphs: nv, ne, edges, neighbors
+using LightGraphs
 using PlanarVisibility
 const PV = PlanarVisibility
 
@@ -137,6 +137,12 @@ end
     @test PV.sortperm_ccw([p2, p3, p4], p1) == [1, 2, 3]
     @test PV.sortperm_ccw([p4, p2, p3], p1) == [2, 3, 1]
     @test PV.sortperm_ccw([p3, p2, p1], p4) == [1, 3, 2]
+end
+
+@testset "sorted edges" begin
+    @test PV.sorted(Edge(1, 2)) == Edge(1, 2)
+    @test PV.sorted(Edge(1, 1)) == Edge(1, 1)
+    @test PV.sorted(Edge(2, 1)) == Edge(1, 2)
 end
 
 @testset "triangle orientation" begin

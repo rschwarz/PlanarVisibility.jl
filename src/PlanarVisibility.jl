@@ -4,7 +4,7 @@ import Base: length, push!, getindex
 using LinearAlgebra
 
 using GeoInterface
-using LightGraphs: SimpleGraph, Edge, add_edge!, edges
+using LightGraphs
 
 include("points.jl")
 include("intersect.jl")
@@ -89,6 +89,14 @@ function sortperm_ccw(points::Vector{Point}, origin::Point)::Vector{Int}
     return sortperm(points, by=by)
 end
 
+"Sorted edge for unique representation"
+function sorted(edge::Edge)
+    if edge.src < edge.dst
+        return edge
+    else
+        return reverse(edge)
+    end
+end
 
 #
 # Constructing visibility graphs
