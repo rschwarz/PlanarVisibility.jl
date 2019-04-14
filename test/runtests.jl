@@ -137,6 +137,15 @@ end
     @test PV.sortperm_ccw([p2, p3, p4], p1) == [1, 2, 3]
     @test PV.sortperm_ccw([p4, p2, p3], p1) == [2, 3, 1]
     @test PV.sortperm_ccw([p3, p2, p1], p4) == [1, 3, 2]
+    @test PV.sortperm_ccw([p1, p2, p3, p4], p1) == [1, 2, 3, 4]
+
+    #  1 2
+    # 3   4
+    #  5 6
+    q1, q2, q3, q4, q5, q6 = Point.(
+        [[1., 2.], [2., 2.], [0., 1.], [3., 1.], [1., 0.], [2., 0.]])
+
+    @test_broken PV.sortperm_ccw([q1, q2, q3, q4, q5, q6], q1) == [1, 2, 3, 5, 6, 4]
 end
 
 @testset "sorted edges" begin
