@@ -243,3 +243,24 @@ end
     @test PV.visible_points(points, graph, 5) == [6, 4, 3]
     @test PV.visible_points(points, graph, 6) == [4, 3, 5]
 end
+
+@testset "visible points -- boxes" begin
+    #      8--7
+    # 4--3 |  |
+    # |  | 5--6
+    # 1--2
+    env = PV.Environment([
+        Polygon([[[0., 0.], [1., 0.], [1., 2.], [0., 2.], [0., 0.]]]),
+        Polygon([[[2., 1.], [3., 1.], [4., 3.], [2., 3.], [2., 1.]]])])
+    points = PV.extract_points(env)
+    graph = PV.extract_edges(env, points)
+
+    @test length(points) == 8
+    @test nv(graph) == 8
+    @test ne(graph) == 8
+
+    @test_broken PV.visible_points(points, graph, 1) == [2, 4]
+    @test_broken PV.visible_points(points, graph, 2) == [6, 5, 8, 3, 1]
+    @test_broken PV.visible_points(points, graph, 3) == [8, 4, 2, 5]
+    @test_broken PV.visible_points(points, graph, 4) == [3, 8, 1]
+end
