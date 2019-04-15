@@ -119,16 +119,22 @@ end
 end
 
 @testset "compute angles" begin
-    #    3
+    # 4  3
     # 1  2
-    p1, p2, p3 = Point.([[0, 0], [1, 0], [1, 1]])
+    p1, p2, p3, p4 = Point.([[0, 0], [1, 0], [1, 1], [0, 1]])
     @test PV.angle_to_east(p1, p1) == 0.0
     @test PV.angle_to_east(p1, p2) ≈ 0.0
     @test PV.angle_to_east(p1, p3) ≈ 2π/8
+    @test PV.angle_to_east(p1, p4) ≈ 2π/4
     @test PV.angle_to_east(p2, p1) ≈ 2π/2
     @test PV.angle_to_east(p2, p3) ≈ 2π/4
+    @test PV.angle_to_east(p2, p4) ≈ 3/8 * 2π
     @test PV.angle_to_east(p3, p1) ≈ 5/8 * 2π
     @test PV.angle_to_east(p3, p2) ≈ 3/4 * 2π
+    @test PV.angle_to_east(p3, p4) ≈ 2π/2
+    @test PV.angle_to_east(p4, p1) ≈ 3/4 * 2π
+    @test PV.angle_to_east(p4, p2) ≈ 7/8 * 2π
+    @test PV.angle_to_east(p4, p3) ≈ 0.0
 end
 
 @testset "sorting points in counter clockwise order" begin
