@@ -119,13 +119,15 @@ end
 end
 
 @testset "compute angles" begin
+    #    3
+    # 1  2
     p1, p2, p3 = Point.([[0, 0], [1, 0], [1, 1]])
     @test PV.angle_to_east(p1, p1) == 0.0
     @test PV.angle_to_east(p1, p2) ≈ 0.0
     @test PV.angle_to_east(p1, p3) ≈ 2π/8
     @test PV.angle_to_east(p2, p1) ≈ 2π/2
     @test PV.angle_to_east(p2, p3) ≈ 2π/4
-    @test PV.angle_to_east(p3, p1) ≈ 7/8 * 2π
+    @test PV.angle_to_east(p3, p1) ≈ 5/8 * 2π
     @test PV.angle_to_east(p3, p2) ≈ 3/4 * 2π
 end
 
@@ -145,7 +147,7 @@ end
     q1, q2, q3, q4, q5, q6 = Point.(
         [[1., 2.], [2., 2.], [0., 1.], [3., 1.], [1., 0.], [2., 0.]])
 
-    @test_broken PV.sortperm_ccw([q1, q2, q3, q4, q5, q6], q1) == [1, 2, 3, 5, 6, 4]
+    @test PV.sortperm_ccw([q1, q2, q3, q4, q5, q6], q1) == [1, 2, 3, 5, 6, 4]
 end
 
 @testset "sorted edges" begin
@@ -226,5 +228,5 @@ end
     add_edge!(graph, 3, 4)
     add_edge!(graph, 5, 6)
 
-    @test_broken PV.visible_points(points, graph, 1) == [2, 3, 4]
+    @test PV.visible_points(points, graph, 1) == [2, 3, 4]
 end

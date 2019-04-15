@@ -67,19 +67,26 @@ end
 
 "Angle from origin to point rel. to horiz. line going east."
 function angle_to_east(origin::Point, point::Point)::Float64
-    diff = coordinates(point) - coordinates(origin)
-    distance = norm(diff)
-    altitude = diff[2]
-    if altitude > 0.0
-        return asin(altitude / distance)
-    elseif altitude == 0.0
-        if diff[1] >= 0.0
+    dx, dy = coordinates(point) - coordinates(origin)
+    angle = asin(abs(dy) / norm([dx, dy]))
+    if dy > 0.0 # top
+        if dx >= 0.0 # right
+            return angle
+        else # dx < 0, left
+            return π - angle
+        end
+    elseif dy < 0.0
+        if dx >= 0.0 # right
+            return 2π - angle
+        else # dx < 0, left
+            return π + angle
+        end
+    else # dy == 0.0
+        if dx >= 0.0
             return 0.0
-        else
+        else # dx < 0.0
             return π
         end
-    else # altitude < 0.0
-        return 2π + asin(altitude / distance)
     end
 end
 
@@ -128,7 +135,6 @@ function visible_points(points::PointSet, envgraph::SimpleGraph, origin::Int64)
     for index in perm
         index == origin && continue
         cand = points[index]
-        @show index open_edges cand
 
         # open edges: rm incident, clockwise edges
         for neighbor in neighbors(envgraph, index)
