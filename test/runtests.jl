@@ -237,4 +237,9 @@ end
     add_edge!(graph, 5, 6)
 
     @test PV.visible_points(points, graph, 1) == [2, 3, 4]
+    @test PV.visible_points(points, graph, 2) == [1, 3, 4]
+    @test PV.visible_points(points, graph, 3) == [4, 2, 1, 5, 6]
+    @test PV.visible_points(points, graph, 4) == [2, 1, 3, 5, 6]
+    @test PV.visible_points(points, graph, 5) == [6, 4, 3]
+    @test PV.visible_points(points, graph, 6) == [4, 3, 5]
 end
