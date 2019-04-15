@@ -154,6 +154,8 @@ end
         [[1., 2.], [2., 2.], [0., 1.], [3., 1.], [1., 0.], [2., 0.]])
 
     @test PV.sortperm_ccw([q1, q2, q3, q4, q5, q6], q1) == [1, 2, 3, 5, 6, 4]
+    @test PV.sortperm_ccw([q1, q2, q3, q4, q5, q6], q3) == [3, 4, 2, 1, 5, 6]
+    @test PV.sortperm_ccw([q1, q2, q3, q4, q5, q6], q5) == [5, 6, 4, 2, 1, 3]
 end
 
 @testset "sorted edges" begin
