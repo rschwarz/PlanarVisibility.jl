@@ -1,6 +1,9 @@
 using Test
+
+using DataStructures
 using GeoInterface
 using LightGraphs
+
 using PlanarVisibility
 const PV = PlanarVisibility
 
@@ -116,6 +119,24 @@ end
     @test neighbors(graph, 4) == [5, 6]
     @test neighbors(graph, 5) == [4, 6]
     @test neighbors(graph, 6) == [4, 5]
+end
+
+@testset "extract_components" begin
+    # two polygons
+    env = PV.Environment([
+        Polygon([[[0.0, 0.0], [1.0, 0.0], [0.0, 1.0], [0.0, 0.0]]]),
+        Polygon([[[2.0, 0.0], [3.0, 0.0], [2.0, 1.0], [2.0, 0.0]]])])
+    set = PV.extract_points(env)
+    comps = PV.extract_components(env, set)
+    @test in_same_set(comps, 1, 2)
+    @test in_same_set(comps, 1, 3)
+    @test in_same_set(comps, 2, 3)
+    @test !in_same_set(comps, 1, 4)
+    @test !in_same_set(comps, 1, 5)
+    @test !in_same_set(comps, 1, 6)
+    @test in_same_set(comps, 4, 5)
+    @test in_same_set(comps, 5, 6)
+    @test in_same_set(comps, 6, 4)
 end
 
 @testset "compute angles" begin

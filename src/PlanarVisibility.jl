@@ -3,6 +3,7 @@ module PlanarVisibility
 import Base: length, push!, getindex
 using LinearAlgebra
 
+using DataStructures
 using GeoInterface
 using LightGraphs
 
@@ -63,6 +64,25 @@ function extract_edges(env::Environment, points::PointSet)
     end
 
     return graph
+end
+
+"Extract connected components (via polygons) from environment."
+function extract_components(env::Environment, points::PointSet)
+    # start with disjoint set forest
+    components = IntDisjointSets(length(points))
+
+    # for each polygon, merge all points
+    for polygon in env.polygons
+        linestrings = coordinates(polygon)
+        length(linestrings) == 1 || error("nonconvex polygons not implemented!")
+        positions = linestrings[1]
+        first = points[positions[1]] # get index
+        for other in positions[2:end]
+            union!(components, first, points[other])
+        end
+    end
+
+    return components
 end
 
 "Angle from origin to point rel. to horiz. line going east."
