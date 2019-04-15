@@ -130,7 +130,8 @@ end
 #
 
 "Find all visible points from given origin."
-function visible_points(points::PointSet, envgraph::SimpleGraph, origin::Int64)
+function visible_points(points::PointSet, envgraph::SimpleGraph,
+                        polycomps::IntDisjointSets, origin::Int64)
     # point at origin
     orig = points[origin]
 
@@ -173,7 +174,13 @@ function visible_points(points::PointSet, envgraph::SimpleGraph, origin::Int64)
             end
         end
 
-        # TODO: check if line-of-sight is inside of polygon
+        # check if line-of-sight is inside of polygon
+        if visible && !has_edge(envgraph, origin, index)
+            if in_same_set(polycomps, origin, index)
+                visible = false
+            end
+        end
+        # TODO: deal with non-convex polygons
 
         if visible
             push!(result, index)
@@ -197,13 +204,16 @@ function construct_graph(env::Environment)
     # extract edges from environment
     envgraph = extract_edges(env, points)
 
+    # extract connected componenst from environment polygons
+    polycomps = extract_components(env, points)
+
     # build graph from disconnected points
     n = length(points)
     graph = SimpleGraph(n)
 
     # iterate over all points and find out what can be seen from there
     for i in 1:n
-        for j in visible_points(points, envgraph, i)
+        for j in visible_points(points, envgraph, polycomps, i)
             add_edge!(graph, i, j)
         end
     end

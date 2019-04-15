@@ -257,12 +257,14 @@ end
     add_edge!(graph, 3, 4)
     add_edge!(graph, 5, 6)
 
-    @test PV.visible_points(points, graph, 1) == [2, 3, 4]
-    @test PV.visible_points(points, graph, 2) == [1, 3, 4]
-    @test PV.visible_points(points, graph, 3) == [4, 2, 1, 5, 6]
-    @test PV.visible_points(points, graph, 4) == [2, 1, 3, 5, 6]
-    @test PV.visible_points(points, graph, 5) == [6, 4, 3]
-    @test PV.visible_points(points, graph, 6) == [4, 3, 5]
+    pc = IntDisjointSets(6) # no polygons
+
+    @test PV.visible_points(points, graph, pc, 1) == [2, 3, 4]
+    @test PV.visible_points(points, graph, pc, 2) == [1, 3, 4]
+    @test PV.visible_points(points, graph, pc, 3) == [4, 2, 1, 5, 6]
+    @test PV.visible_points(points, graph, pc, 4) == [2, 1, 3, 5, 6]
+    @test PV.visible_points(points, graph, pc, 5) == [6, 4, 3]
+    @test PV.visible_points(points, graph, pc, 6) == [4, 3, 5]
 end
 
 @testset "visible points -- boxes" begin
@@ -275,13 +277,15 @@ end
         Polygon([[[2., 1.], [3., 1.], [4., 3.], [2., 3.], [2., 1.]]])])
     points = PV.extract_points(env)
     graph = PV.extract_edges(env, points)
+    comps = PV.extract_components(env, points)
 
     @test length(points) == 8
     @test nv(graph) == 8
     @test ne(graph) == 8
 
-    @test_broken PV.visible_points(points, graph, 1) == [2, 4]
-    @test_broken PV.visible_points(points, graph, 2) == [6, 5, 8, 3, 1]
-    @test_broken PV.visible_points(points, graph, 3) == [8, 4, 2, 5]
-    @test_broken PV.visible_points(points, graph, 4) == [3, 8, 1]
+    vis = i -> PV.visible_points(points, graph, comps, i)
+    @test vis(1) == [2, 4]
+    @test vis(2) == [6, 5, 8, 3, 1]
+    @test vis(3) == [8, 4, 2, 5]
+    @test vis(4) == [3, 8, 1]
 end
